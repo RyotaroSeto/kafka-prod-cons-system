@@ -31,3 +31,6 @@ func main() {
 		fmt.Printf("message at offset %d: %s = %s\n", m.Offset, string(m.Key), string(m.Value))
 	}
 }
+
+// groupIDとか？考える
+// https://github.com/pachyderm/pachyderm/blob/1b209a3a9f751c5115a6a7624234bf475fcd7cbf/etc/testing/kafka/main.go#L34
