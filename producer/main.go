@@ -34,7 +34,8 @@ type kafkaConnection struct {
 func newConnection() *kafkaConnection {
 	return &kafkaConnection{
 		writer: kafka.NewWriter(kafka.WriterConfig{
-			Brokers: []string{host},
+			Brokers:     []string{host},
+			MaxAttempts: 3,
 		}),
 	}
 }
