@@ -2,33 +2,39 @@ package main
 
 import (
 	"context"
-	"log"
 	"os"
-	"time"
 
 	"github.com/segmentio/kafka-go"
 )
 
+var (
+	topic = os.Getenv("SUBSCRIPTION_TOPIC")
+	host  = os.Getenv("SUBSCRIPTION_HOST")
+)
+
 func main() {
-	topic := os.Getenv("SUBSCRIPTION_TOPIC")
-	partition := 0
+	conn := newConnection()
+	defer conn.writer.Close()
 
-	conn, err := kafka.DialLeader(context.Background(), "tcp", os.Getenv("SUBSCRIPTION_HOST"), topic, partition)
-	if err != nil {
-		log.Fatal("failed to dial leader:", err)
-	}
+	produce(conn)
+}
 
-	conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
-	_, err = conn.WriteMessages(
-		kafka.Message{Value: []byte("one!")},
-		kafka.Message{Value: []byte("two!")},
-		kafka.Message{Value: []byte("three!")},
-	)
-	if err != nil {
-		log.Fatal("failed to write messages:", err)
-	}
+func produce(conn *kafkaConnection) {
+	conn.writer.WriteMessages(context.Background(), kafka.Message{
+		Topic: topic,
+		Key:   []byte("Key"),
+		Value: []byte("Hello World!"),
+	})
+}
 
-	if err := conn.Close(); err != nil {
-		log.Fatal("failed to close writer:", err)
+type kafkaConnection struct {
+	writer *kafka.Writer
+}
+
+func newConnection() *kafkaConnection {
+	return &kafkaConnection{
+		writer: kafka.NewWriter(kafka.WriterConfig{
+			Brokers: []string{host},
+		}),
 	}
 }
