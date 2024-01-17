@@ -36,9 +36,10 @@ func newConnection(topic string) *kafkaConnection {
 	groupID := topic
 	return &kafkaConnection{
 		reader: kafka.NewReader(kafka.ReaderConfig{
-			Brokers: []string{host},
-			GroupID: groupID,
-			Topic:   topic,
+			Brokers:     []string{host},
+			GroupID:     groupID,
+			Topic:       topic,
+			MaxAttempts: 3,
 		}),
 	}
 }
